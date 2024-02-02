@@ -11,6 +11,20 @@ html {
   justify-content: center;
   flex-direction: column;
 }
+.game-image {
+  display: flex;
+  width: 250px;
+  border: 2px solid #a9673a;
+  background: #7e4833;
+  padding: 0.25rem;
+  border-radius: 5px;
+}
+
+.game-image img {
+  width: 100%;
+  object-fit: contain;
+  height: auto;
+}
 .title {
   font-family: 'Saira Condensed';
   font-size: 22px;
@@ -20,7 +34,7 @@ html {
   background: #7e4833;
   border-radius: 5px;
   line-height: 22px;
-  margin: 0 0 1rem;
+  margin: -1rem 0 1rem;
 }
 .preview-options {
   display: flex;
@@ -77,12 +91,12 @@ html {
 .source-panel {
   display: flex;
   flex-direction: column;
-  max-width: 440px;
+  flex-shrink: 0;
+  padding: 0.5rem;
   margin: 0 auto;
   background-color: #d8b880;
   border: 1px solid #2e170d;
   border-radius: 5px;
-  padding: 0.5rem;
 }
 .panel-title {
   font-family: 'Saira Condensed';
@@ -94,7 +108,6 @@ html {
   width: 100%;
   height: 100%; 
   box-sizing: border-box;
-  max-width: 440px;
   padding: 0.5rem;
   background-color: #ead9bb;
   font-size: 13px;
@@ -106,18 +119,18 @@ html {
   resize: vertical;
 }
 .preview-panel {
-  max-width: 440px;
+  flex-shrink: 0;
   margin: 0 auto;
+  padding: 0.5rem;
   font-family: 'Saira Condensed';
   font-size: 20px;
   color: #5b2e26;
   background-color: #d8b880;
   border: 1px solid #2e170d;
   border-radius: 5px;
-  padding: 0.5rem;
+  
 }
 #preview {
-  max-width: 440px;
   margin: 0 auto;
   padding: 1rem;
   background-color: #ead9bb;
@@ -130,6 +143,30 @@ html {
   line-height: 1.5rem;
 }
 
+.credits {
+  display: flex;
+  align-items: center;
+  margin: 1rem;
+  font-family: 'Saira Condensed';
+  font-size: 18px;
+  color: #1b1009;
+  gap: 0.25rem;
+}
+
+.heart {
+  font-size: 12px;
+}
+
+i.discord {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  background-image: url("/images/discord.png");
+  background-repeat: repeat-y;
+  background-size: contain;
+
+}
+
 .brown {
   font-weight: bold;
   color: #9a4000;
@@ -139,6 +176,7 @@ html {
   color: blue; /* Change this to your desired highlight color */
   font-weight: bold; /* Add any other desired styles */
 }
+
 
 /* Track */
 ::-webkit-scrollbar {

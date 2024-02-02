@@ -66,7 +66,7 @@ var control = {
     "WASD": "__IMGSTART__l_stick.png __TITLE__'Left Stick'  __IMGEND__",
     "RightStick": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "ObjectMove": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
-    "LeftMouseDetect": "<img src='/images/rb.png title='RB'/>",
+    "LeftMouseDetect": "<img src='./images/rb.png title='RB'/>",
     "{1}": "__IMGSTART__share.png __TITLE__'Interact' __IMGEND__",
     "UIInteract": "__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__",
     "Interact": "__IMGSTART__a.png __TITLE__'A' __IMGEND__",
@@ -91,7 +91,7 @@ let tagmap = {
 	"__SPANOPEN": "<span class=",
 	"__SPANCLOSE__": ">",
 	"__SPANEND__": "</span>",
-	"__IMGSTART__" : "<img src='/images/",
+	"__IMGSTART__" : "<img src='./images/",
 	"__TITLE__": "' title=",
 	"__IMGEND__": "/>"
 }
