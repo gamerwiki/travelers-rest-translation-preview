@@ -1,0 +1,55 @@
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Travelers Rest Translation Preview</title>
+    <link href="./src/styles.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="title">Travelers Rest Translation Preview</div>
+      <div class="preview-options">
+        <div class="option">
+          <div class="controller-type-title">Controller type:</div>
+          <div class="controller-type">
+            <button data-type="keyboard" title="keyboard" class="contol-button active">
+              <img src="./images/keyboard.png" />
+            </button>
+            <button data-type="gamepad" title="gamepad" class="contol-button">
+              <img src="./images/gamepad.png" />
+            </button>
+          </div>
+        </div>
+        <div class="option">
+          <div class="gender-title">Gender:</div>
+          <div class="gender-select">
+            <button class="gender-button active" data-gender="male">
+              <img src="./images/male.png" title="female"/>
+            </button>
+            <button class="gender-button" data-gender="female">
+              <img src="./images/female.png" title="female"/>
+            </button>
+          </div>
+        </div>
+        <div class="option">
+          <div class="gender-title">Selected gender:</div>
+          <div class="selected-gender">male</div>
+        </div>
+      </div>
+      <div class="translation-panel">
+        <div class="source-panel">
+          <div class="panel-title">Source text</div>
+          <textarea id="translation" rows="4" cols="50" onchange="updatePreview()"></textarea>
+        </div>
+        <div class="preview-panel">
+          <div class="panel-title">In game text</div>
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+    <script src="./src/script.js"></script>
+  </body>
+
+</html>
