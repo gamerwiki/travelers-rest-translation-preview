@@ -1,3 +1,8 @@
+const VERSION = '0.3'
+
+const el_version = document.getElementById('version');
+el_version.textContent = `v.${VERSION}`;
+
 let translation = "Move with [Action: WASD]\r\n\r\nHold [Action: SprintHoldAction] to run.\r\n\r\nWith [Action: Interact] and [Action: Select] you can interact with most objects and containers.\r\n\r\nPress [Action: BuildMode] to enter and exit Decoration mode.\r\n\r\n[ControllerType:Click on the [Brown=sign under the clock] or press [Action: OpenTavern] to open and close the tavern, Press [Action: OpenTavern] to open and close the tavern.]\r\n\r\nPress [Action: OpenInventory] to access the inventory.\r\n\r\nPress [Action: Pause] to access the pause menu and game options.";
 
 let controlType = "keyboard";

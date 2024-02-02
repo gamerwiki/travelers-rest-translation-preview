@@ -18,6 +18,16 @@ html {
   background: #7e4833;
   padding: 0.25rem;
   border-radius: 5px;
+  position: relative;
+}
+#version {
+  position: absolute;
+  right: 4px;
+  bottom: -16px;
+  font-size: 11px;
+  font-family: consolas;
+  color: #1b1009;
+  font-weight: bold;
 }
 
 .game-image img {
@@ -35,6 +45,7 @@ html {
   border-radius: 5px;
   line-height: 22px;
   margin: -1rem 0 1rem;
+  z-index: 1;
 }
 .preview-options {
   display: flex;
@@ -161,7 +172,7 @@ i.discord {
   display: flex;
   width: 20px;
   height: 20px;
-  background-image: url("./images/discord.png");
+  background-image: url("../images/discord.png");
   background-repeat: repeat-y;
   background-size: contain;
 
