@@ -1,4 +1,4 @@
-const VERSION = '0.3'
+const VERSION = '0.4'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
@@ -136,6 +136,10 @@ function replaceTagsAndActions(inputText, controlType) {
   inputText = inputText.replace(/\[Brown=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '<span class="brown">$1</span>');
 
   inputText = inputText.replace(/\[Brown=([^\[\]]+)\]/g, '<span class="brown">$1</span>');
+
+  inputText = inputText.replace(/\[Red=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '<span class="red">$1</span>');
+
+  inputText = inputText.replace(/\[Red=([^\[\]]+)\]/g, '<span class="red">$1</span>');
 
   inputText = inputText.replace(/<color=(.*?)>/g, '<span style="color:$1;">').replace(/<\/color>/g,'</span>');
 

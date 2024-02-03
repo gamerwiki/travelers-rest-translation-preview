@@ -187,9 +187,14 @@ i.discord {
   color: #9a4000;
 }
 
+.red {
+  font-weight: bold;
+  color: #b90000;
+}
+
 .highlighted {
-  color: blue; /* Change this to your desired highlight color */
-  font-weight: bold; /* Add any other desired styles */
+  color: blue;
+  font-weight: bold;
 }
 
 
@@ -212,8 +217,6 @@ i.discord {
   border-color: #baa860;
 }
 
-/* For Firefox */
-/* You can adjust the styles as needed */
 
 /* Track */
 textarea {
