@@ -1,4 +1,4 @@
-const VERSION = '0.4'
+const VERSION = '0.5'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
@@ -51,7 +51,7 @@ var control = {
     "Interact": "__SPANOPEN 'brown'__SPANCLOSE__E__SPANEND__",
     "Rotate": "__SPANOPEN 'brown'__SPANCLOSE__R__SPANEND__",
     "Style": "__SPANOPEN 'brown'__SPANCLOSE__T__SPANEND__",
-    "Use": "__SPANOPEN 'brown'__SPANCLOSE__E__SPANEND__",
+    "Use": "__SPANOPEN 'brown'__SPANCLOSE__F__SPANEND__",
     "BuildMode": "__SPANOPEN 'brown'__SPANCLOSE__B__SPANEND__",
     "SprintHoldAction": "__SPANOPEN 'brown'__SPANCLOSE__SHIFT__SPANEND__",
     "Select": "__SPANOPEN 'brown'__SPANCLOSE__F__SPANEND__",
