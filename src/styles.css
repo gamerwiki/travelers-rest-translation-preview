@@ -22,7 +22,7 @@ html {
 }
 #version {
   position: absolute;
-  right: 4px;
+  right: -2px;
   bottom: -16px;
   font-size: 11px;
   font-family: consolas;
@@ -190,6 +190,11 @@ i.discord {
 .red {
   font-weight: bold;
   color: #b90000;
+}
+
+.grey {
+  font-weight: bold;
+  color: #696969;
 }
 
 .highlighted {
