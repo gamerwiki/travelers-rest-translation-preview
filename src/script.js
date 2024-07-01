@@ -1,9 +1,9 @@
-const VERSION = '0.5.1'
+const VERSION = '0.6'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
 
-let translation = "Move with [Action: WASD]\r\n\r\nHold [Action: SprintHoldAction] to run.\r\n\r\nWith [Action: Interact] and [Action: Select] you can interact with most objects and containers.\r\n\r\nPress [Action: BuildMode] to enter and exit Decoration mode.\r\n\r\n[ControllerType:Click on the [Brown=sign under the clock] or press [Action: OpenTavern] to open and close the tavern, Press [Action: OpenTavern] to open and close the tavern.]\r\n\r\nPress [Action: OpenInventory] to access the inventory.\r\n\r\nPress [Action: Pause] to access the pause menu and game options.";
+let translation = "To place the new items, press [Action=OpenInventory] and move them from the [Red=inventory] to the [Red=action bar].\n\nWith decoration mode active ([Action=BuildMode]), you can [Brown=place an item] by navigating to its slot with [Action=ScrollUp] - [Action=ScrollDown] [ControllerType=or [Brown=clicking] on its icon in the action bar and right-clicking/ and pressing [Action=Use]].\n\nPlace all your new items in the tavern to continue, and remember to deactivate decoration mode ([Action=BuildMode]) when you're done.";
 
 let controlType = "keyboard";
 let gender = 'male';
@@ -127,25 +127,26 @@ function fixMissingClosingBracket(inputString) {
 function replaceTagsAndActions(inputText, controlType) {
   var actionTexts = (controlType === "keyboard") ? control.keyboard : control.gamepad;
 
-  inputText = fixMissingClosingBracket(inputText)
-  inputText = inputText.replace(/\[Action: (.*?)\]/g, function(match, p1) {
-    var customText = actionTexts[p1] || p1;
-    return customText ;
+  //inputText = fixMissingClosingBracket(inputText)
+
+  inputText = inputText.replace(/\[Action[=:]\s*(.*?)\]/g, function(match, p1) {
+    let customText = actionTexts[p1] || p1;
+    return customText;
   });
+  
 
-  inputText = inputText.replace(/\[Brown=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '<span class="brown">$1</span>');
+  inputText = inputText.replace(/\[Brown=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '__SPANOPEN"brown">$1__SPANEND__');
 
-  inputText = inputText.replace(/\[Brown=([^\[\]]+)\]/g, '<span class="brown">$1</span>');
+  inputText = inputText.replace(/\[Brown=([^\[\]]+)\]/g, '__SPANOPEN"brown"__SPANCLOSE__$1__SPANEND__');
 
-  inputText = inputText.replace(/\[Red=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '<span class="red">$1</span>');
+  inputText = inputText.replace(/\[Red=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '__SPANOPEN"red"__SPANCLOSE__$1__SPANEND__');
 
-  inputText = inputText.replace(/\[Red=([^\[\]]+)\]/g, '<span class="red">$1</span>');
+  inputText = inputText.replace(/\[Red=([^\[\]]+)\]/g, '__SPANOPEN"red"__SPANCLOSE__$1__SPANEND__');
 
-  inputText = inputText.replace(/\[Grey=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '<span class="grey">$1</span>');
+  inputText = inputText.replace(/\[Grey=([^[\]]+\[[^\]]+\][^\]]*)\]/g, '__SPANOPEN"grey"__SPANCLOSE__$1__SPANEND__');
 
-  inputText = inputText.replace(/\[Grey=([^\[\]]+)\]/g, '<span class="grey">$1</span>');
+  inputText = inputText.replace(/\[Grey=([^\[\]]+)\]/g, '__SPANOPEN"grey"__SPANCLOSE__$1__SPANEND__');
 
-  inputText = inputText.replace(/<color=(.*?)>/g, '<span style="color:$1;">').replace(/<\/color>/g,'</span>');
 
   inputText = inputText.replace(/<sprite name=(.*?)>/g, function(match, p1) {
     var customText = actionTexts[p1] || p1;
@@ -172,14 +173,16 @@ function replaceTagsAndActions(inputText, controlType) {
   
 
   inputText = inputText.replace(/\[ControllerType=\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, keyboardPart, gamepadPart) {
-  return (controlType === "keyboard") ? keyboardPart : gamepadPart;
-});
+    return (controlType === "keyboard") ? keyboardPart : gamepadPart;
+  });
 
   Object.keys(tagmap).forEach(function(tag) {
 	  let customText = tagmap[tag];
 	  let regex = new RegExp(tag, 'g');
 	  inputText = inputText.replace(regex, customText);
-	});  
+	});
+
+  inputText = inputText.replace(/<color=(.*?)>/g, '<span style="color:$1;">').replace(/<\/color>/g,'</span>');
 
   inputText = inputText.replace(/\[.*?Gender=\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, genderMale, genderFemale) {
   return (gender === "male") ? genderMale : genderFemale;
