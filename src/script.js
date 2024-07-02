@@ -1,4 +1,4 @@
-const VERSION = '0.6'
+const VERSION = '0.6.1'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
