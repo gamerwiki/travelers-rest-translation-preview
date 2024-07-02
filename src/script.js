@@ -39,11 +39,12 @@ genderButtons.forEach(function (button) {
 
 
 
-var control = {
+let control = {
   keyboard: {
     "WASD": "__SPANOPEN 'brown'__SPANCLOSE__W/A/S/D__SPANEND__",
     "RightStick": "__SPANOPEN 'brown'__SPANCLOSE__Left Mouse Button__SPANEND__",
     "ObjectMove": "__SPANOPEN 'brown'__SPANCLOSE__Mouse__SPANEND__",
+    "Objective": "__SPANOPEN 'brown'__SPANCLOSE__?__SPANEND__",
     "LeftMouseDetect": "__SPANOPEN 'brown'__SPANCLOSE__Left Mouse Button__SPANEND__",
     "RightMouseDetect": "__SPANOPEN 'brown'__SPANCLOSE__Right Mouse Button__SPANEND__",
     "{0}": "__SPANOPEN 'brown'__SPANCLOSE__SPACE__SPANEND__",
@@ -71,6 +72,7 @@ var control = {
     "WASD": "__IMGSTART__l_stick.png __TITLE__'Left Stick'  __IMGEND__",
     "RightStick": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "ObjectMove": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
+    "Objective": "__IMGSTART__unknown.png __TITLE__'Right Stick' __IMGEND__",
     "LeftMouseDetect": "<img src='./images/rb.png title='RB'/>",
     "{1}": "__IMGSTART__share.png __TITLE__'Interact' __IMGEND__",
     "UIInteract": "__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__",
@@ -125,7 +127,7 @@ function fixMissingClosingBracket(inputString) {
 }
 
 function replaceTagsAndActions(inputText, controlType) {
-  var actionTexts = (controlType === "keyboard") ? control.keyboard : control.gamepad;
+  let actionTexts = (controlType === "keyboard") ? control.keyboard : control.gamepad;
 
   //inputText = fixMissingClosingBracket(inputText)
 
@@ -149,18 +151,18 @@ function replaceTagsAndActions(inputText, controlType) {
 
 
   inputText = inputText.replace(/<sprite name=(.*?)>/g, function(match, p1) {
-    var customText = actionTexts[p1] || p1;
+    let customText = actionTexts[p1] || p1;
     return customText ;
   });
 
 
   inputText = inputText.replace(/(\{0\})/g, function(match, p1) {
-    var customText = actionTexts[p1] || p1;
+    let customText = actionTexts[p1] || p1;
     return customText ;
   });
 
   inputText = inputText.replace(/(\{1\})/g, function(match, p1) {
-    var customText = actionTexts[p1] || p1;
+    let customText = actionTexts[p1] || p1;
     return customText ;
   });
 
