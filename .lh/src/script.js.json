@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 39,
+            "activePatchIndex": 42,
             "patches": [
                 {
                     "date": 1719858388321,
@@ -164,6 +164,18 @@
                 {
                     "date": 1719939611656,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-const VERSION = '0.6'\r\n+const VERSION = '0.6.1'\r\n \r\n const el_version = document.getElementById('version');\r\n el_version.textContent = `v.${VERSION}`;\r\n \r\n"
+                },
+                {
+                    "date": 1720005019302,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,9 +43,9 @@\n   keyboard: {\r\n     \"WASD\": \"__SPANOPEN 'brown'__SPANCLOSE__W/A/S/D__SPANEND__\",\r\n     \"RightStick\": \"__SPANOPEN 'brown'__SPANCLOSE__Left Mouse Button__SPANEND__\",\r\n     \"ObjectMove\": \"__SPANOPEN 'brown'__SPANCLOSE__Mouse__SPANEND__\",\r\n-    \"Objective\": \"__SPANOPEN 'brown'__SPANCLOSE__?__SPANEND__\",\r\n+    \"Objective\": \"__SPANOPEN 'brown'__SPANCLOSE__P__SPANEND__\",\r\n     \"LeftMouseDetect\": \"__SPANOPEN 'brown'__SPANCLOSE__Left Mouse Button__SPANEND__\",\r\n     \"RightMouseDetect\": \"__SPANOPEN 'brown'__SPANCLOSE__Right Mouse Button__SPANEND__\",\r\n     \"{0}\": \"__SPANOPEN 'brown'__SPANCLOSE__SPACE__SPANEND__\",\r\n     \"UIInteract\": \"__SPANOPEN 'brown'__SPANCLOSE__START__SPANEND__\",\r\n@@ -71,9 +71,9 @@\n   gamepad: {\r\n     \"WASD\": \"__IMGSTART__l_stick.png __TITLE__'Left Stick'  __IMGEND__\",\r\n     \"RightStick\": \"__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__\",\r\n     \"ObjectMove\": \"__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__\",\r\n-    \"Objective\": \"__IMGSTART__unknown.png __TITLE__'Right Stick' __IMGEND__\",\r\n+    \"Objective\": \"__IMGSTART__up.png __TITLE__'Right Stick' __IMGEND__\",\r\n     \"LeftMouseDetect\": \"<img src='./images/rb.png title='RB'/>\",\r\n     \"{1}\": \"__IMGSTART__share.png __TITLE__'Interact' __IMGEND__\",\r\n     \"UIInteract\": \"__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__\",\r\n     \"Interact\": \"__IMGSTART__a.png __TITLE__'A' __IMGEND__\",\r\n"
+                },
+                {
+                    "date": 1720005208073,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -71,9 +71,9 @@\n   gamepad: {\r\n     \"WASD\": \"__IMGSTART__l_stick.png __TITLE__'Left Stick'  __IMGEND__\",\r\n     \"RightStick\": \"__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__\",\r\n     \"ObjectMove\": \"__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__\",\r\n-    \"Objective\": \"__IMGSTART__up.png __TITLE__'Right Stick' __IMGEND__\",\r\n+    \"Objective\": \"__IMGSTART__up.png __TITLE__'Up' __IMGEND__\",\r\n     \"LeftMouseDetect\": \"<img src='./images/rb.png title='RB'/>\",\r\n     \"{1}\": \"__IMGSTART__share.png __TITLE__'Interact' __IMGEND__\",\r\n     \"UIInteract\": \"__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__\",\r\n     \"Interact\": \"__IMGSTART__a.png __TITLE__'A' __IMGEND__\",\r\n"
+                },
+                {
+                    "date": 1720005214901,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-const VERSION = '0.6.1'\r\n+const VERSION = '0.6.2'\r\n \r\n const el_version = document.getElementById('version');\r\n el_version.textContent = `v.${VERSION}`;\r\n \r\n"
                 }
             ],
             "date": 1719858388321,
