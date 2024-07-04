@@ -1,9 +1,9 @@
-const VERSION = '0.6.2'
+const VERSION = '0.6.3'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
 
-let translation = "To place the new items, press [Action=OpenInventory] and move them from the [Red=inventory] to the [Red=action bar].\n\nWith decoration mode active ([Action=BuildMode]), you can [Brown=place an item] by navigating to its slot with [Action=ScrollUp] - [Action=ScrollDown] [ControllerType=or [Brown=clicking] on its icon in the action bar and right-clicking/ and pressing [Action=Use]].\n\nPlace all your new items in the tavern to continue, and remember to deactivate decoration mode ([Action=BuildMode]) when you're done.";
+let translation = "[ControllerType=You can click on it with [Action=LeftMouseDetect] or press [Action=OpenTavern]/You can press [Action=OpenTavern]] to [Red=open] and [Red=close] the tavern when you want. ";
 
 let controlType = "keyboard";
 let gender = 'male';
@@ -73,7 +73,7 @@ let control = {
     "RightStick": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "ObjectMove": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "Objective": "__IMGSTART__up.png __TITLE__'Up' __IMGEND__",
-    "LeftMouseDetect": "<img src='./images/rb.png title='RB'/>",
+    "LeftMouseDetect": "__IMGSTART__rb.png title='RB'__IMGEND__",
     "{1}": "__IMGSTART__share.png __TITLE__'Interact' __IMGEND__",
     "UIInteract": "__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__",
     "Interact": "__IMGSTART__a.png __TITLE__'A' __IMGEND__",
