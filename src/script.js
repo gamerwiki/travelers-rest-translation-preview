@@ -1,4 +1,4 @@
-const VERSION = '0.6.4'
+const VERSION = '0.6.5'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
@@ -175,6 +175,10 @@ function replaceTagsAndActions(inputText, controlType) {
   
 
   inputText = inputText.replace(/\[ControllerType=\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, keyboardPart, gamepadPart) {
+    return (controlType === "keyboard") ? keyboardPart : gamepadPart;
+  });
+
+  inputText = inputText.replace(/\[ControllerType=\s?([\s\S]*?),\s?([\s\S]*?)\]/g, function(match, keyboardPart, gamepadPart) {
     return (controlType === "keyboard") ? keyboardPart : gamepadPart;
   });
 
