@@ -1,4 +1,4 @@
-const VERSION = '0.6.3'
+const VERSION = '0.6.4'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
@@ -73,7 +73,7 @@ let control = {
     "RightStick": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "ObjectMove": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "Objective": "__IMGSTART__up.png __TITLE__'Up' __IMGEND__",
-    "LeftMouseDetect": "__IMGSTART__rb.png title='RB'__IMGEND__",
+    "LeftMouseDetect": "__IMGSTART__rb.png __TITLE__='RB'__IMGEND__",
     "{1}": "__IMGSTART__share.png __TITLE__'Interact' __IMGEND__",
     "UIInteract": "__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__",
     "Interact": "__IMGSTART__a.png __TITLE__'A' __IMGEND__",
