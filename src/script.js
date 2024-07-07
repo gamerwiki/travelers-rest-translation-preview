@@ -1,4 +1,4 @@
-const VERSION = '0.6.5'
+const VERSION = '0.6.6'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
@@ -172,6 +172,10 @@ function replaceTagsAndActions(inputText, controlType) {
   inputText = inputText.replace(/\[ControllerType:\s?([\s\S]*?),\s?([\s\S]*?)\]/g, function(match, keyboardPart, gamepadPart) {
     return (controlType === "keyboard") ? keyboardPart : gamepadPart;
   });
+
+  inputText = inputText.replace(/\[ControllerType:\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, keyboardPart, gamepadPart) {
+    return (controlType === "keyboard") ? keyboardPart : gamepadPart;
+  });
   
 
   inputText = inputText.replace(/\[ControllerType=\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, keyboardPart, gamepadPart) {
@@ -188,7 +192,8 @@ function replaceTagsAndActions(inputText, controlType) {
 	  inputText = inputText.replace(regex, customText);
 	});
 
-  inputText = inputText.replace(/<color=(.*?)>/g, '<span style="color:$1;">').replace(/<\/color>/g,'</span>');
+  //inputText = inputText.replace(/<color=(.*?)>/g, '<span style="color:$1;">').replace(/<\/color>/g,'</span>');
+  inputText = inputText.replace(/<color=(["']?)(#[0-9a-fA-F]{3,6}|[a-zA-Z]+)\1>/g, '<span style="color:$2;">').replace(/<\/color>/g, '</span>');
 
   inputText = inputText.replace(/\[.*?Gender=\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, genderMale, genderFemale) {
   return (gender === "male") ? genderMale : genderFemale;
