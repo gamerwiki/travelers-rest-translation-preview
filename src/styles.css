@@ -29,6 +29,9 @@ html {
   color: #1b1009;
   font-weight: bold;
 }
+#emoji {
+  cursor: pointer;
+}
 
 .game-image img {
   width: 100%;
@@ -166,6 +169,7 @@ html {
   font-size: 18px;
   color: #1b1009;
   gap: 0.25rem;
+  user-select: none;
 }
 
 .heart {

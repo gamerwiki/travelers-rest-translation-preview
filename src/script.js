@@ -1,7 +1,24 @@
-const VERSION = '0.6.6'
+const VERSION = '0.6.7'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
+
+const emojis = ["❤️", "🧡", "💛", "💚", "💙", "💜", "🤎", "🖤", "🤍", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟",
+  "🍡", "🍧", "🍨", "🍦", "🥧", "🧁", "🍰","🎂","🍮", "🍭", "🍬", "🍫", "🍿", "🍩", "🍪", "🍯", "🥛", "☕️", "🍵", "🧃", "🥤",
+  "🍺", "🍻", "🥂", "🍷", "🥃", "🍸", "🍹", "🧉", "🍾"];
+const emoji = document.getElementById('emoji');
+
+function getRandomNumber(max) {
+  return Math.floor(Math.random() * (max + 1));
+}
+
+let selectedEmoji = getRandomNumber(emojis.length - 1);
+emoji.textContent = emojis[selectedEmoji];
+
+emoji.addEventListener('click', function () {
+  selectedEmoji = getRandomNumber(emojis.length - 1);
+  emoji.textContent = emojis[selectedEmoji];
+});
 
 let translation = "[ControllerType=You can click on it with [Action=LeftMouseDetect] or press [Action=OpenTavern]/You can press [Action=OpenTavern]] to [Red=open] and [Red=close] the tavern when you want. ";
 
