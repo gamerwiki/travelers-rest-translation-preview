@@ -135,6 +135,48 @@ html {
   outline: none;
   resize: vertical;
 }
+.sample-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  font-family: 'Saira Condensed';
+  font-size: 15px;
+  color: #5b2e26;
+}
+.sample-controls select {
+  min-width: 145px;
+  padding: 0.25rem;
+  font-family: 'Saira Condensed';
+  font-size: 15px;
+  color: #5b2e26;
+  background: #ead9bb;
+  border: 1px solid #c48943;
+  border-radius: 4px;
+}
+#placeholder-hint {
+  margin-top: 0.35rem;
+  max-width: 410px;
+  font-family: 'Saira Condensed';
+  font-size: 13px;
+  line-height: 1.1rem;
+  color: #6b3c13;
+}
+#samples-button {
+  padding: 0.3rem 0.55rem;
+  font-family: 'Saira Condensed';
+  font-size: 15px;
+  color: #ffe5bb;
+  background: #7e4833;
+  border: 1px solid #5b2e26;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#samples-button:hover,
+#samples-button:focus-visible {
+  background: #9a4000;
+}
 .preview-panel {
   flex-shrink: 0;
   margin: 0;
@@ -206,6 +248,109 @@ i.discord {
   font-weight: bold;
 }
 
+/* Animated translation tags: [Bounce=text], [Wave=text], [Shake=text],
+   [Pulse=text], plus <bounce>text</bounce>-style tags. */
+.animated-text {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  vertical-align: baseline;
+  unicode-bidi: isolate;
+}
+
+.animated-character {
+  display: inline-block;
+  animation-delay: calc(var(--character-index) * 70ms);
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.animated-space {
+  display: inline;
+  animation: none;
+}
+
+#preview {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+#preview bdi {
+  unicode-bidi: isolate;
+}
+
+.animated-text[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+#preview[dir="ltr"] {
+  direction: ltr;
+}
+
+#preview[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.animated-bounce .animated-character { animation-name: translation-bounce; animation-duration: 900ms; }
+.animated-wave .animated-character { animation-name: translation-wave; animation-duration: 1.2s; }
+.animated-shake .animated-character { animation-name: translation-shake; animation-duration: 650ms; }
+.animated-pulse .animated-character { animation-name: translation-pulse; animation-duration: 1.1s; }
+.animated-wiggle .animated-character { animation-name: translation-wiggle; animation-duration: 1s; }
+
+.text-align-center {
+  display: block;
+  text-align: center;
+}
+
+.translation-link {
+  color: #6b3c13;
+  text-decoration: underline;
+}
+
+@keyframes translation-bounce {
+  0%, 55%, 100% { transform: translateY(0); }
+  20% { transform: translateY(-0.34em); }
+  35% { transform: translateY(0.06em); }
+}
+
+@keyframes translation-wave {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-0.18em) rotate(-3deg); }
+  50% { transform: translateY(0.1em) rotate(3deg); }
+  75% { transform: translateY(-0.08em) rotate(-1deg); }
+}
+
+@keyframes translation-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-0.08em); }
+  40% { transform: translateX(0.08em); }
+  60% { transform: translateX(-0.05em); }
+  80% { transform: translateX(0.05em); }
+}
+
+@keyframes translation-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  45% { transform: scale(1.16); opacity: 0.72; }
+}
+
+@keyframes translation-wiggle {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-0.18em); }
+  50% { transform: translateY(0.12em); }
+  75% { transform: translateY(-0.08em); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-character {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 
 /* Track */
 ::-webkit-scrollbar {
@@ -236,6 +381,19 @@ textarea {
 /* Handle on hover */
 textarea:hover {
   scrollbar-color: #b28040   #f0f0f0;
+}
+
+@media (max-width: 760px) {
+  .translation-panel {
+    width: calc(100% - 1rem);
+    flex-direction: column;
+  }
+
+  .source-panel,
+  .preview-panel {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 
