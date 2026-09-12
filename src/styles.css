@@ -65,6 +65,16 @@ html {
   margin-left: 0.25rem;
   text-transform: capitalize;
 }
+.direction-option select {
+  margin-left: 0.25rem;
+  padding: 0.1rem 0.25rem;
+  font-family: 'Saira Condensed';
+  font-size: 15px;
+  color: #5b2e26;
+  background: #ead9bb;
+  border: 1px solid #c48943;
+  border-radius: 4px;
+}
 .controller-type button {
   background-color: transparent;
   border: none;

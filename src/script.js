@@ -25,6 +25,7 @@ let translation = "[ControllerType=You can click on it with [Action=LeftMouseDet
 let controlType = "keyboard";
 let gender = 'male';
 let singlePlayer = true;
+let textDirection = 'auto';
 
 const controlButtons = document.querySelectorAll('.controller-type .contol-button');
 
@@ -58,6 +59,12 @@ genderButtons.forEach(function (button) {
 const singlePlayerToggle = document.getElementById('single-player');
 singlePlayerToggle.addEventListener('change', function () {
   singlePlayer = singlePlayerToggle.checked;
+  updatePreview();
+});
+
+const directionSelect = document.getElementById('direction-select');
+directionSelect.addEventListener('change', function () {
+  textDirection = directionSelect.value;
   updatePreview();
 });
 
@@ -319,8 +326,9 @@ function updatePreview() {
   // Use an explicit direction for the preview block. CSS does not support
   // `direction: auto`; the HTML `dir` attribute is what determines the base
   // direction here, while isolated spans protect mixed-script segments.
-  const isRtlPreview = getTextDirection(inputText) === 'rtl';
-  previewDiv.dir = isRtlPreview ? 'rtl' : 'ltr';
+  const resolvedDirection = textDirection === 'auto' ? getTextDirection(inputText) : textDirection;
+  const isRtlPreview = resolvedDirection === 'rtl';
+  previewDiv.dir = resolvedDirection;
   previewDiv.style.textAlign = isRtlPreview ? 'right' : 'left';
   placeholderHint.hidden = !/\{\d+\}/.test(inputText);
 }
