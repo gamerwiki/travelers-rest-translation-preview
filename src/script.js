@@ -192,10 +192,34 @@ function normalizeLineBreaks(inputText) {
     .replace(/\\\s*\\/g, '\n\n');
 }
 
+function closeUnclosedRichTextTags(inputText) {
+  // Some original and completed translations omit closing rich-text tags.
+  // Repair only tags understood by this preview, leaving unknown markup alone.
+  const supportedTags = 'bounce|wave|shake|pulse|wiggle|b|strong|i|em|u|size|color|align|link';
+  const tagPattern = new RegExp(`<(/?)(${supportedTags})\\b[^>]*>`, 'gi');
+  const openTags = [];
+  let match;
+
+  while ((match = tagPattern.exec(inputText)) !== null) {
+    const tagName = match[2].toLowerCase();
+    if (match[1]) {
+      const matchingTag = openTags.lastIndexOf(tagName);
+      if (matchingTag !== -1) openTags.splice(matchingTag, 1);
+    } else if (!/\/\\s*>$/.test(match[0])) {
+      openTags.push(tagName);
+    }
+  }
+
+  return inputText + openTags.reverse().map(function (tagName) {
+    return `</${tagName}>`;
+  }).join('');
+}
+
 function replaceTagsAndActions(inputText, controlType) {
 	animationPlaceholders.length = 0;
 	inputText = normalizeLineBreaks(inputText);
 	inputText = fixMissingClosingBracket(inputText);
+  inputText = closeUnclosedRichTextTags(inputText);
   let actionTexts = (controlType === "keyboard") ? control.keyboard : control.gamepad;
   const spriteFallbacks = { Music: '♫', Break_Emote: '💥' };
 
