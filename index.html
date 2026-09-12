@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Travelers Rest Translation Preview</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%237e4833'/%3E%3Cpath d='M8 8h16v4H8zm2 6h12v10H10z' fill='%23ffe5bb'/%3E%3C/svg%3E">
     <link href="./src/styles.css" rel="stylesheet" type="text/css" />
   </head>
 
@@ -26,8 +27,8 @@
             </button>
           </div>
         </div>
-        <div class="option">
-          <div class="gender-title">Gender:</div>
+          <div class="option">
+            <div class="gender-title">Gender:</div>
           <div class="gender-select">
             <button class="gender-button active" data-gender="male">
               <img src="./images/male.png" title="female"/>
@@ -43,10 +44,45 @@
         <div class="source-panel">
           <div class="panel-title">Source text</div>
           <textarea id="translation" rows="4" cols="50" onchange="updatePreview()"></textarea>
+          <div class="sample-controls">
+            <label for="sample-select">Samples:</label>
+            <select id="sample-select">
+              <option value="original">Original example</option>
+              <option value="languages">Language sampler</option>
+              <option value="formatting">Formatting sampler</option>
+              <option value="line-breaks">Line-break sampler</option>
+              <option value="rtl">RTL and mixed text</option>
+              <option value="game-tags">Game tag sampler</option>
+              <option value="controls">Controllers and placeholders</option>
+              <option value="variants">Gender and co-op variants</option>
+              <option value="layout">Layout markers</option>
+              <option value="edge-cases">Edge cases</option>
+            </select>
+            <button id="samples-button" type="button">Load sample</button>
+          </div>
+          <div id="placeholder-hint" hidden>
+            Placeholders such as {0} and {1} are filled by the game at runtime. Leave them unchanged unless they represent a controller input.
+          </div>
+          <div class="option single-player-option">
+            <label for="single-player">Single-player:</label>
+            <input id="single-player" type="checkbox" checked>
+          </div>
+          <div class="option direction-option">
+            <label for="direction-select">Text direction:</label>
+            <select id="direction-select">
+              <option value="auto">Auto</option>
+              <option value="ltr">Left-to-right</option>
+              <option value="rtl">Right-to-left</option>
+            </select>
+            <button id="direction-info" type="button" aria-label="About text direction" aria-expanded="false" hidden>ⓘ</button>
+          </div>
+          <div id="direction-info-text" hidden>
+            This direction setting only affects the website preview. It does not change the translation or guarantee the same layout in Travellers Rest.
+          </div>
         </div>
         <div class="preview-panel">
           <div class="panel-title">In game text</div>
-          <div id="preview"></div>
+          <div id="preview" dir="auto"></div>
         </div>
       </div>
       <div class="credits">

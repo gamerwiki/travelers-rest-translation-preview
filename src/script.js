@@ -1,4 +1,4 @@
-const VERSION = '0.6.7'
+const VERSION = '0.6.8'
 
 const el_version = document.getElementById('version');
 el_version.textContent = `v.${VERSION}`;
@@ -20,10 +20,12 @@ emoji.addEventListener('click', function () {
   emoji.textContent = emojis[selectedEmoji];
 });
 
-let translation = "[ControllerType=You can click on it with [Action=LeftMouseDetect] or press [Action=OpenTavern]/You can press [Action=OpenTavern]] to [Red=open] and [Red=close] the tavern when you want. ";
+let translation = "[ControllerType=You can click on it with [Action=LeftMouseDetect] or press [Action=OpenTavern]/You can press [Action=OpenTavern]] to [Red=open] and [Red=close] the tavern when you want. [Bounce=Cheers!]";
 
 let controlType = "keyboard";
 let gender = 'male';
+let singlePlayer = true;
+let textDirection = 'auto';
 
 const controlButtons = document.querySelectorAll('.controller-type .contol-button');
 
@@ -54,7 +56,23 @@ genderButtons.forEach(function (button) {
     });
   });
 
+const singlePlayerToggle = document.getElementById('single-player');
+singlePlayerToggle.addEventListener('change', function () {
+  singlePlayer = singlePlayerToggle.checked;
+  updatePreview();
+});
 
+const directionSelect = document.getElementById('direction-select');
+const directionInfo = document.getElementById('direction-info');
+const directionInfoText = document.getElementById('direction-info-text');
+directionSelect.addEventListener('change', function () {
+  textDirection = directionSelect.value;
+  updatePreview();
+});
+directionInfo.addEventListener('click', function () {
+  directionInfoText.hidden = !directionInfoText.hidden;
+  directionInfo.setAttribute('aria-expanded', String(!directionInfoText.hidden));
+});
 
 let control = {
   keyboard: {
@@ -91,6 +109,7 @@ let control = {
     "ObjectMove": "__IMGSTART__r_stick.png __TITLE__'Right Stick' __IMGEND__",
     "Objective": "__IMGSTART__up.png __TITLE__'Up' __IMGEND__",
     "LeftMouseDetect": "__IMGSTART__rb.png __TITLE__='RB'__IMGEND__",
+    "RightMouseDetect": "__IMGSTART__lb.png __TITLE__'LB' __IMGEND__",
     "{1}": "__IMGSTART__share.png __TITLE__'Interact' __IMGEND__",
     "UIInteract": "__IMGSTART__share.png __TITLE__'Share Button' __IMGEND__",
     "Interact": "__IMGSTART__a.png __TITLE__'A' __IMGEND__",
@@ -143,8 +162,42 @@ function fixMissingClosingBracket(inputString) {
   return fixedString;
 }
 
+function sanitizePreviewHtml(markup) {
+  const previewDocument = new DOMParser().parseFromString(`<div>${markup}</div>`, 'text/html');
+  const previewRoot = previewDocument.body.firstElementChild;
+  previewRoot.querySelectorAll('script, iframe, object, embed, style, link').forEach(function (element) {
+    element.remove();
+  });
+
+  previewRoot.querySelectorAll('*').forEach(function (element) {
+    Array.from(element.attributes).forEach(function (attribute) {
+      const value = attribute.value.trim().toLowerCase();
+      if (/^on/i.test(attribute.name) || /^(javascript|data):/.test(value)) {
+        element.removeAttribute(attribute.name);
+      }
+      if (attribute.name === 'src' && !attribute.value.startsWith('./images/')) {
+        element.removeAttribute(attribute.name);
+      }
+    });
+  });
+  return previewRoot.innerHTML;
+}
+
+function normalizeLineBreaks(inputText) {
+  // Translation exports can contain escaped line breaks instead of literal
+  // newlines. The legacy `\ \` marker also represents an empty line.
+  return inputText
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\\s*\\/g, '\n\n');
+}
+
 function replaceTagsAndActions(inputText, controlType) {
+	animationPlaceholders.length = 0;
+	inputText = normalizeLineBreaks(inputText);
+	inputText = fixMissingClosingBracket(inputText);
   let actionTexts = (controlType === "keyboard") ? control.keyboard : control.gamepad;
+  const spriteFallbacks = { Music: '♫', Break_Emote: '💥' };
 
   //inputText = fixMissingClosingBracket(inputText)
 
@@ -168,7 +221,8 @@ function replaceTagsAndActions(inputText, controlType) {
 
 
   inputText = inputText.replace(/<sprite name=(.*?)>/g, function(match, p1) {
-    let customText = actionTexts[p1] || p1;
+    const spriteName = p1.replace(/["']/g, '');
+    let customText = actionTexts[p1] || spriteFallbacks[spriteName] || spriteName;
     return customText ;
   });
 
@@ -212,21 +266,43 @@ function replaceTagsAndActions(inputText, controlType) {
   //inputText = inputText.replace(/<color=(.*?)>/g, '<span style="color:$1;">').replace(/<\/color>/g,'</span>');
   inputText = inputText.replace(/<color=(["']?)(#[0-9a-fA-F]{3,6}|[a-zA-Z]+)\1>/g, '<span style="color:$2;">').replace(/<\/color>/g, '</span>');
 
-  inputText = inputText.replace(/\[.*?Gender=\s?([\s\S]*?)\/\s?([\s\S]*?)\]/g, function(match, genderMale, genderFemale) {
+  inputText = inputText.replace(/<\/?(b|strong)>/gi, function (match) {
+    return match.charAt(1) === '/' ? '</strong>' : '<strong>';
+  });
+  inputText = inputText.replace(/<\/?(i|em)>/gi, function (match) {
+    return match.charAt(1) === '/' ? '</em>' : '<em>';
+  });
+  inputText = inputText.replace(/<\/?u>/gi, function (match) {
+    return match.charAt(1) === '/' ? '</u>' : '<u>';
+  });
+  inputText = inputText.replace(/<size\s*=\s*["']?(\d+(?:\.\d+)?)(%|px)?["']?\s*>/gi, '<span style="font-size:$1$2;">').replace(/<\/size>/gi, '</span>');
+
+  inputText = inputText.replace(/<align\s*=\s*["']?center["']?\s*>/gi, '<span class="text-align-center">').replace(/<\/align>/gi, '</span>');
+  inputText = inputText.replace(/<link\s*=\s*["']?[^>"']+["']?\s*>/gi, '<span class="translation-link">').replace(/<\/link>/gi, '</span>');
+  inputText = inputText.replace(/<br\s*\/?>/gi, '<br>');
+
+  inputText = inputText.replace(/\[[A-Za-z]+Gender\s*=\s*([\s\S]*?)\/\s*([\s\S]*?)\]/g, function(match, genderMale, genderFemale) {
   return (gender === "male") ? genderMale : genderFemale;
 });
 
-  return inputText;
+  inputText = inputText.replace(/\[SinglePlayer\s*=\s*([\s\S]*?)\/\s*([\s\S]*?)\]/g, function(match, singlePlayerText, multiplayerText) {
+    return singlePlayer ? singlePlayerText : multiplayerText;
+  });
+
+  inputText = inputText.replace(/\[Brown2\s*=\s*([^\]]+)\]/g, '<span class="brown">$1</span>');
+
+  inputText = replaceAnimatedText(inputText);
+  return sanitizePreviewHtml(restoreAnimatedText(inputText));
 }
 
 
 const translationTextarea = document.getElementById("translation");
 const preview = document.getElementById("preview");
+const placeholderHint = document.getElementById('placeholder-hint');
 
 if(translationTextarea.value.trim().length <= 0){
   translationTextarea.value = translation;
-  let converted = replaceTagsAndActions(translation,controlType)
-  preview.innerHTML = converted;
+  window.setTimeout(updatePreview, 0);
 }
 
 translationTextarea.addEventListener("input", function() {
@@ -239,4 +315,121 @@ function updatePreview() {
   let previewDiv = document.getElementById('preview');
   let converted = replaceTagsAndActions(inputText,controlType)
   previewDiv.innerHTML = converted;
+  const textNodes = [];
+  const walker = document.createTreeWalker(previewDiv, NodeFilter.SHOW_TEXT);
+  let textNode;
+  while ((textNode = walker.nextNode())) {
+    if (textNode.textContent.trim() && !textNode.parentElement.closest('.animated-text, bdi')) {
+      textNodes.push(textNode);
+    }
+  }
+  textNodes.forEach(function (node) {
+    const isolatedText = document.createElement('bdi');
+    isolatedText.dir = 'auto';
+    node.parentNode.replaceChild(isolatedText, node);
+    isolatedText.appendChild(node);
+  });
+  // Use an explicit direction for the preview block. CSS does not support
+  // `direction: auto`; the HTML `dir` attribute is what determines the base
+  // direction here, while isolated spans protect mixed-script segments.
+  const resolvedDirection = textDirection === 'auto' ? getTextDirection(inputText) : textDirection;
+  const isRtlPreview = resolvedDirection === 'rtl';
+  previewDiv.dir = resolvedDirection;
+  previewDiv.style.textAlign = isRtlPreview ? 'right' : 'left';
+  directionInfo.hidden = !(isRtlPreview || textDirection !== 'auto');
+  if (directionInfo.hidden) {
+    directionInfoText.hidden = true;
+    directionInfo.setAttribute('aria-expanded', 'false');
+  }
+  placeholderHint.hidden = !/\{\d+\}/.test(inputText);
+}
+
+const samples = {
+  original: translation,
+  languages: '[Bounce=Cheers!] [Wave=Привет мир] [Shake=Καλημέρα] [Pulse=مرحبا]\n<b>你好世界</b> · <i>こんにちは世界</i> · <size=24>안녕하세요</size>',
+  formatting: '<b>Bold text</b> · <i>Italic text</i> · <u>Underlined text</u> · <size=24>Large text</size> · [Red=Red text] · [Brown=Brown text]',
+  'line-breaks': 'Line one\\nLine two\\n\\nLine four\\ \\Line six',
+  rtl: '[Bounce=هذا نص عربي] [Wave=שלום עולם]\\nEnglish mixed with العربية and 日本語.',
+  'game-tags': '<size=120%><wiggle>Nigel!</wiggle></size> <wave><sprite name="Music">Song</wave><br><align="center"><b>Centered</b></align> [Brown2=all year round] [PlayerGender=he/she] [SinglePlayer=alone/together]',
+  controls: '[ControllerType=Move with [Action: WASD] and open the staff panel with [Action: Staff]/Move with [Action: WASD] and open the staff panel with [Action: Staff]]\\nAction placeholders: {0}, {1}, <sprite name="Music">',
+  variants: '[PlayerGender=He/She] is playing [SinglePlayer=alone/together]. [PlayerGender=His/Her] tavern is ready!',
+  layout: 'First line\\nSecond line\\n\\nFourth line\\ \Legacy blank line\\n<br>HTML break<align="center">Centered text</align>',
+  'edge-cases': '[Bounce=Áé नमस्ते مرحبا 日本語 🍻] [Red=Unclosed color\\nLong text that should wrap cleanly without breaking the preview panel.'
+};
+const sampleSelect = document.getElementById('sample-select');
+const samplesButton = document.getElementById('samples-button');
+samplesButton.addEventListener('click', function () {
+  translationTextarea.value = samples[sampleSelect.value];
+  updatePreview();
+});
+
+// Render each animated character independently, which gives the text the
+// staggered motion used by game UI rather than moving one solid text block.
+const animationPlaceholders = [];
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, function (character) {
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character];
+  });
+}
+
+function splitIntoGraphemes(value) {
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    return Array.from(segmenter.segment(value), function (part) { return part.segment; });
+  }
+  return Array.from(value);
+}
+
+function getTextDirection(value) {
+  const textOnly = value
+    .replace(/<[^>]*>/g, '')
+    .replace(/\[[A-Za-z][^\]=]*(?:=|:)/g, '')
+    .replace(/\[\/?[A-Za-z][^\]]*\]/g, '');
+  for (const character of splitIntoGraphemes(textOnly)) {
+    if (/[\u0590-\u08ff]/.test(character)) return 'rtl';
+    if (/\p{L}/u.test(character)) return 'ltr';
+  }
+  return 'ltr';
+}
+
+function addAnimatedText(content, effect) {
+  const animatedDocument = new DOMParser().parseFromString(`<div>${content}</div>`, 'text/html');
+  const animatedRoot = animatedDocument.body.firstElementChild;
+  const textNodes = [];
+  const walker = animatedDocument.createTreeWalker(animatedRoot, NodeFilter.SHOW_TEXT);
+  let textNode;
+  while ((textNode = walker.nextNode())) textNodes.push(textNode);
+  textNodes.forEach(function (node) {
+    const fragment = animatedDocument.createDocumentFragment();
+    splitIntoGraphemes(node.textContent).forEach(function (character, index) {
+      const characterElement = animatedDocument.createElement('span');
+      const isWhitespace = /^\s+$/.test(character);
+      characterElement.className = isWhitespace ? 'animated-space' : 'animated-character';
+      characterElement.style.setProperty('--character-index', index);
+      characterElement.textContent = character;
+      fragment.appendChild(characterElement);
+    });
+    node.parentNode.replaceChild(fragment, node);
+  });
+  const direction = getTextDirection(animatedRoot.textContent);
+  const placeholder = `__ANIMATED_TEXT_${animationPlaceholders.length}__`;
+  animationPlaceholders.push(`<span class="animated-text animated-${effect}" dir="${direction}" aria-label="${escapeHtml(animatedRoot.textContent)}">${animatedRoot.innerHTML}</span>`);
+  return placeholder;
+}
+
+function replaceAnimatedText(inputText) {
+  inputText = inputText.replace(/\[(Bounce|Wave|Shake|Pulse|Wiggle)\s*=\s*([^\[\]]+)\]/gi, function (match, effect, content) {
+    return addAnimatedText(content, effect.toLowerCase());
+  });
+  inputText = inputText.replace(/<(bounce|wave|shake|pulse|wiggle)(?:\s+[^>]*)?>([\s\S]*?)<\/\1>/gi, function (match, effect, content) {
+    return addAnimatedText(content, effect.toLowerCase());
+  });
+  return inputText;
+}
+
+function restoreAnimatedText(inputText) {
+  return inputText.replace(/__ANIMATED_TEXT_(\d+)__/g, function (match, index) {
+    return animationPlaceholders[Number(index)] || match;
+  });
 }
