@@ -75,6 +75,22 @@ html {
   border: 1px solid #c48943;
   border-radius: 4px;
 }
+.direction-option button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #5b2e26;
+  font-size: 16px;
+  cursor: pointer;
+}
+#direction-info-text {
+  margin: 0.25rem 0 0.1rem;
+  max-width: 410px;
+  font-family: 'Saira Condensed';
+  font-size: 13px;
+  line-height: 1.1rem;
+  color: #6b3c13;
+}
 .controller-type button {
   background-color: transparent;
   border: none;

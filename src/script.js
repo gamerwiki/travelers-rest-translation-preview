@@ -63,9 +63,15 @@ singlePlayerToggle.addEventListener('change', function () {
 });
 
 const directionSelect = document.getElementById('direction-select');
+const directionInfo = document.getElementById('direction-info');
+const directionInfoText = document.getElementById('direction-info-text');
 directionSelect.addEventListener('change', function () {
   textDirection = directionSelect.value;
   updatePreview();
+});
+directionInfo.addEventListener('click', function () {
+  directionInfoText.hidden = !directionInfoText.hidden;
+  directionInfo.setAttribute('aria-expanded', String(!directionInfoText.hidden));
 });
 
 let control = {
@@ -330,6 +336,11 @@ function updatePreview() {
   const isRtlPreview = resolvedDirection === 'rtl';
   previewDiv.dir = resolvedDirection;
   previewDiv.style.textAlign = isRtlPreview ? 'right' : 'left';
+  directionInfo.hidden = !(isRtlPreview || textDirection !== 'auto');
+  if (directionInfo.hidden) {
+    directionInfoText.hidden = true;
+    directionInfo.setAttribute('aria-expanded', 'false');
+  }
   placeholderHint.hidden = !/\{\d+\}/.test(inputText);
 }
 
