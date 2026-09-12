@@ -63,15 +63,16 @@ singlePlayerToggle.addEventListener('change', function () {
 });
 
 const directionSelect = document.getElementById('direction-select');
-const directionInfo = document.getElementById('direction-info');
-const directionInfoText = document.getElementById('direction-info-text');
+const previewInfoButton = document.getElementById('preview-info-button');
+const previewInfoPanel = document.getElementById('preview-info-panel');
+const previewRepairNote = document.getElementById('preview-repair-note');
 directionSelect.addEventListener('change', function () {
   textDirection = directionSelect.value;
   updatePreview();
 });
-directionInfo.addEventListener('click', function () {
-  directionInfoText.hidden = !directionInfoText.hidden;
-  directionInfo.setAttribute('aria-expanded', String(!directionInfoText.hidden));
+previewInfoButton.addEventListener('click', function () {
+  previewInfoPanel.hidden = !previewInfoPanel.hidden;
+  previewInfoButton.setAttribute('aria-expanded', String(!previewInfoPanel.hidden));
 });
 
 let control = {
@@ -198,6 +199,7 @@ function closeUnclosedRichTextTags(inputText) {
   const supportedTags = 'bounce|wave|shake|pulse|wiggle|b|strong|i|em|u|size|color|align|link';
   const tagPattern = new RegExp(`<(/?)(${supportedTags})\\b[^>]*>`, 'gi');
   const openTags = [];
+  repairedRichTextTags = [];
   let match;
 
   while ((match = tagPattern.exec(inputText)) !== null) {
@@ -210,10 +212,16 @@ function closeUnclosedRichTextTags(inputText) {
     }
   }
 
-  return inputText + openTags.reverse().map(function (tagName) {
+  const repairedTags = openTags.reverse();
+  repairedTags.forEach(function (tagName) {
+    if (!repairedRichTextTags.includes(tagName)) repairedRichTextTags.push(tagName);
+  });
+  return inputText + repairedTags.map(function (tagName) {
     return `</${tagName}>`;
   }).join('');
 }
+
+let repairedRichTextTags = [];
 
 function replaceTagsAndActions(inputText, controlType) {
 	animationPlaceholders.length = 0;
@@ -360,10 +368,11 @@ function updatePreview() {
   const isRtlPreview = resolvedDirection === 'rtl';
   previewDiv.dir = resolvedDirection;
   previewDiv.style.textAlign = isRtlPreview ? 'right' : 'left';
-  directionInfo.hidden = !(isRtlPreview || textDirection !== 'auto');
-  if (directionInfo.hidden) {
-    directionInfoText.hidden = true;
-    directionInfo.setAttribute('aria-expanded', 'false');
+  previewRepairNote.hidden = repairedRichTextTags.length === 0;
+  if (repairedRichTextTags.length > 0) {
+    previewRepairNote.textContent = `Missing closing tags were repaired for this preview: ${repairedRichTextTags.map(function (tagName) {
+      return `<${tagName}>`;
+    }).join(', ')}.`;
   }
   placeholderHint.hidden = !/\{\d+\}/.test(inputText);
 }
