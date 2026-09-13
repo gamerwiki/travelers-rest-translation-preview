@@ -252,10 +252,19 @@ function replaceTagsAndActions(inputText, controlType) {
   inputText = inputText.replace(/\[Grey=([^\[\]]+)\]/g, '__SPANOPEN"grey"__SPANCLOSE__$1__SPANEND__');
 
 
-  inputText = inputText.replace(/<sprite name=(.*?)>/g, function(match, p1) {
-    const spriteName = p1.replace(/["']/g, '');
-    let customText = actionTexts[p1] || spriteFallbacks[spriteName] || spriteName;
-    return customText ;
+  // Accept normal rich text as well as the doubled quotes found in some
+  // AssetRipper/CSV exports: name="ruU" and name=""ruU"".
+  inputText = inputText.replace(/<sprite\s+name\s*=\s*(?:"{1,2}|'{1,2})?([^"' >]+)(?:"{1,2}|'{1,2})?\s*\/?>/gi, function(match, spriteName) {
+    const actionSprite = actionTexts[`"${spriteName}"`] || actionTexts[spriteName];
+    if (actionSprite) return actionSprite;
+    const sprite = runeSprites[spriteName];
+    if (sprite) {
+      const displayScale = 0.68;
+      const baseFontSize = 20;
+      const em = function (value) { return `${(value * displayScale / baseFontSize).toFixed(4)}em`; };
+      return `<span class="game-sprite" role="img" aria-label="${spriteName}" style="--sprite-x:${em(-sprite.x)};--sprite-top:${em(-sprite.top)};--sprite-width:${em(sprite.width)};--sprite-height:${em(sprite.height)};--atlas-width:${em(110)};--atlas-height:${em(140)}"></span>`;
+    }
+    return spriteFallbacks[spriteName] || spriteName;
   });
 
 
@@ -332,6 +341,42 @@ const translationTextarea = document.getElementById("translation");
 const preview = document.getElementById("preview");
 const placeholderHint = document.getElementById('placeholder-hint');
 
+// TextMeshPro rune entries from Travellers Rest's gamepad_buttons_ui_512TMPro atlas.
+// The preview ships only the cropped rune area. AssetRipper stores the glyph Y
+// coordinate from the bottom of the original 512x512 atlas.
+const runeSprites = {};
+const runeAtlasHeight = 512;
+const runeCropTop = 350;
+const runeRows = [
+  ['A', 'B', 'C', 'D', 'E', 'F', 108],
+  ['G', 'H', 'I', 'J', 'K', 'L', 91],
+  ['M', 'N', 'O', 'P', 'Q', 'R', 74],
+  ['S', 'T', 'U', 'V', 'W', 'X', 57],
+  ['Y', 'Z', null, null, null, null, 40]
+];
+runeRows.forEach(function (row) {
+  row.slice(0, 6).forEach(function (letter, column) {
+    if (!letter) return;
+    runeSprites[`ru${letter}`] = {
+      x: 2 + column * 17,
+      top: runeAtlasHeight - row[6] - 14 - runeCropTop,
+      width: 12,
+      height: letter === 'E' ? 15 : 14
+    };
+  });
+});
+
+// These four special glyphs are explicitly present in the exported TMP
+// table. Their atlas rectangles are 16x14 at the top of the cropped region.
+[
+  ['RuneFail1', 1, 7],
+  ['RuneFail2', 18, 7],
+  ['RuneFail3', 1, 24],
+  ['RuneFail4', 18, 24]
+].forEach(function ([name, x, top]) {
+  runeSprites[name] = { x, top, width: 16, height: 14 };
+});
+
 if(translationTextarea.value.trim().length <= 0){
   translationTextarea.value = translation;
   window.setTimeout(updatePreview, 0);
@@ -384,6 +429,9 @@ const samples = {
   'line-breaks': 'Line one\\nLine two\\n\\nLine four\\ \\Line six',
   rtl: '[Bounce=هذا نص عربي] [Wave=שלום עולם]\\nEnglish mixed with العربية and 日本語.',
   'game-tags': '<size=120%><wiggle>Nigel!</wiggle></size> <wave><sprite name="Music">Song</wave><br><align="center"><b>Centered</b></align> [Brown2=all year round] [PlayerGender=he/she] [SinglePlayer=alone/together]',
+  runes: 'Some people ask us to mix <sprite name="ruU"><sprite name="ruL"><sprite name="ruI"><sprite name="ruR"> with <sprite name="ruN"><sprite name="ruA"><sprite name="ruU">…',
+  'rune-alphabet': 'Rune alphabet: <sprite name="ruA"><sprite name="ruB"><sprite name="ruC"><sprite name="ruD"><sprite name="ruE"><sprite name="ruF"><sprite name="ruG"><sprite name="ruH"><sprite name="ruI"><sprite name="ruJ"><sprite name="ruK"><sprite name="ruL"><sprite name="ruM"><sprite name="ruN"><sprite name="ruO"><sprite name="ruP"><sprite name="ruQ"><sprite name="ruR"><sprite name="ruS"><sprite name="ruT"><sprite name="ruU"><sprite name="ruV"><sprite name="ruW"><sprite name="ruX"><sprite name="ruY"><sprite name="ruZ">',
+  'other-sprites': 'Other game sprites: <sprite name="Music"> <sprite name="Rowdy_Emote"> <sprite name="Break_Emote"> <sprite name="RuneFail1"><sprite name="RuneFail2"><sprite name="RuneFail3"><sprite name="RuneFail4">',
   controls: '[ControllerType=Move with [Action: WASD] and open the staff panel with [Action: Staff]/Move with [Action: WASD] and open the staff panel with [Action: Staff]]\\nAction placeholders: {0}, {1}, <sprite name="Music">',
   variants: '[PlayerGender=He/She] is playing [SinglePlayer=alone/together]. [PlayerGender=His/Her] tavern is ready!',
   layout: 'First line\\nSecond line\\n\\nFourth line\\ \Legacy blank line\\n<br>HTML break<align="center">Centered text</align>',
