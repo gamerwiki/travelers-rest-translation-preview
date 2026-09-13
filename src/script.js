@@ -429,6 +429,7 @@ const samples = {
   'line-breaks': 'Line one\\nLine two\\n\\nLine four\\ \\Line six',
   rtl: '[Bounce=هذا نص عربي] [Wave=שלום עולם]\\nEnglish mixed with العربية and 日本語.',
   'game-tags': '<size=120%><wiggle>Nigel!</wiggle></size> <wave><sprite name="Music">Song</wave><br><align="center"><b>Centered</b></align> [Brown2=all year round] [PlayerGender=he/she] [SinglePlayer=alone/together]',
+  'animation-modifiers': '<shake a=0.5>Half-strength shake</shake> · <shake s=2>Double-speed shake</shake> · <wiggle a=2 s=0.75>Stronger, slower wiggle</wiggle>',
   runes: 'Some people ask us to mix <sprite name="ruU"><sprite name="ruL"><sprite name="ruI"><sprite name="ruR"> with <sprite name="ruN"><sprite name="ruA"><sprite name="ruU">…',
   'rune-alphabet': 'Rune alphabet: <sprite name="ruA"><sprite name="ruB"><sprite name="ruC"><sprite name="ruD"><sprite name="ruE"><sprite name="ruF"><sprite name="ruG"><sprite name="ruH"><sprite name="ruI"><sprite name="ruJ"><sprite name="ruK"><sprite name="ruL"><sprite name="ruM"><sprite name="ruN"><sprite name="ruO"><sprite name="ruP"><sprite name="ruQ"><sprite name="ruR"><sprite name="ruS"><sprite name="ruT"><sprite name="ruU"><sprite name="ruV"><sprite name="ruW"><sprite name="ruX"><sprite name="ruY"><sprite name="ruZ">',
   'other-sprites': 'Other game sprites: <sprite name="Music"> <sprite name="Rowdy_Emote"> <sprite name="Break_Emote"> <sprite name="RuneFail1"><sprite name="RuneFail2"><sprite name="RuneFail3"><sprite name="RuneFail4">',
@@ -474,7 +475,21 @@ function getTextDirection(value) {
   return 'ltr';
 }
 
-function addAnimatedText(content, effect) {
+function parseAnimationModifiers(attributes) {
+  const modifiers = { amplitude: 1, speed: 1 };
+  const attributePattern = /\b(a|s)\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))/gi;
+  let match;
+  while ((match = attributePattern.exec(attributes || ''))) {
+    const value = Number(match[2]);
+    if (!Number.isFinite(value) || value <= 0) continue;
+    if (match[1].toLowerCase() === 'a') modifiers.amplitude = value;
+    if (match[1].toLowerCase() === 's') modifiers.speed = value;
+  }
+  return modifiers;
+}
+
+function addAnimatedText(content, effect, modifiers) {
+  modifiers = modifiers || { amplitude: 1, speed: 1 };
   const animatedDocument = new DOMParser().parseFromString(`<div>${content}</div>`, 'text/html');
   const animatedRoot = animatedDocument.body.firstElementChild;
   const textNodes = [];
@@ -495,7 +510,8 @@ function addAnimatedText(content, effect) {
   });
   const direction = getTextDirection(animatedRoot.textContent);
   const placeholder = `__ANIMATED_TEXT_${animationPlaceholders.length}__`;
-  animationPlaceholders.push(`<span class="animated-text animated-${effect}" dir="${direction}" aria-label="${escapeHtml(animatedRoot.textContent)}">${animatedRoot.innerHTML}</span>`);
+  const animationStyle = ` style="--effect-amplitude:${modifiers.amplitude};--effect-speed:${modifiers.speed}"`;
+  animationPlaceholders.push(`<span class="animated-text animated-${effect}"${animationStyle} dir="${direction}" aria-label="${escapeHtml(animatedRoot.textContent)}">${animatedRoot.innerHTML}</span>`);
   return placeholder;
 }
 
@@ -503,8 +519,8 @@ function replaceAnimatedText(inputText) {
   inputText = inputText.replace(/\[(Bounce|Wave|Shake|Pulse|Wiggle)\s*=\s*([^\[\]]+)\]/gi, function (match, effect, content) {
     return addAnimatedText(content, effect.toLowerCase());
   });
-  inputText = inputText.replace(/<(bounce|wave|shake|pulse|wiggle)(?:\s+[^>]*)?>([\s\S]*?)<\/\1>/gi, function (match, effect, content) {
-    return addAnimatedText(content, effect.toLowerCase());
+  inputText = inputText.replace(/<(bounce|wave|shake|pulse|wiggle)([^>]*)>([\s\S]*?)<\/\1>/gi, function (match, effect, attributes, content) {
+    return addAnimatedText(content, effect.toLowerCase(), parseAnimationModifiers(attributes));
   });
   return inputText;
 }
