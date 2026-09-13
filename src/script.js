@@ -63,15 +63,16 @@ singlePlayerToggle.addEventListener('change', function () {
 });
 
 const directionSelect = document.getElementById('direction-select');
-const directionInfo = document.getElementById('direction-info');
-const directionInfoText = document.getElementById('direction-info-text');
+const previewInfoButton = document.getElementById('preview-info-button');
+const previewInfoPanel = document.getElementById('preview-info-panel');
+const previewRepairNote = document.getElementById('preview-repair-note');
 directionSelect.addEventListener('change', function () {
   textDirection = directionSelect.value;
   updatePreview();
 });
-directionInfo.addEventListener('click', function () {
-  directionInfoText.hidden = !directionInfoText.hidden;
-  directionInfo.setAttribute('aria-expanded', String(!directionInfoText.hidden));
+previewInfoButton.addEventListener('click', function () {
+  previewInfoPanel.hidden = !previewInfoPanel.hidden;
+  previewInfoButton.setAttribute('aria-expanded', String(!previewInfoPanel.hidden));
 });
 
 let control = {
@@ -192,10 +193,41 @@ function normalizeLineBreaks(inputText) {
     .replace(/\\\s*\\/g, '\n\n');
 }
 
+function closeUnclosedRichTextTags(inputText) {
+  // Some original and completed translations omit closing rich-text tags.
+  // Repair only tags understood by this preview, leaving unknown markup alone.
+  const supportedTags = 'bounce|wave|shake|pulse|wiggle|b|strong|i|em|u|size|color|align|link';
+  const tagPattern = new RegExp(`<(/?)(${supportedTags})\\b[^>]*>`, 'gi');
+  const openTags = [];
+  repairedRichTextTags = [];
+  let match;
+
+  while ((match = tagPattern.exec(inputText)) !== null) {
+    const tagName = match[2].toLowerCase();
+    if (match[1]) {
+      const matchingTag = openTags.lastIndexOf(tagName);
+      if (matchingTag !== -1) openTags.splice(matchingTag, 1);
+    } else if (!/\/\\s*>$/.test(match[0])) {
+      openTags.push(tagName);
+    }
+  }
+
+  const repairedTags = openTags.reverse();
+  repairedTags.forEach(function (tagName) {
+    if (!repairedRichTextTags.includes(tagName)) repairedRichTextTags.push(tagName);
+  });
+  return inputText + repairedTags.map(function (tagName) {
+    return `</${tagName}>`;
+  }).join('');
+}
+
+let repairedRichTextTags = [];
+
 function replaceTagsAndActions(inputText, controlType) {
 	animationPlaceholders.length = 0;
 	inputText = normalizeLineBreaks(inputText);
 	inputText = fixMissingClosingBracket(inputText);
+  inputText = closeUnclosedRichTextTags(inputText);
   let actionTexts = (controlType === "keyboard") ? control.keyboard : control.gamepad;
   const spriteFallbacks = { Music: '♫', Break_Emote: '💥' };
 
@@ -220,10 +252,19 @@ function replaceTagsAndActions(inputText, controlType) {
   inputText = inputText.replace(/\[Grey=([^\[\]]+)\]/g, '__SPANOPEN"grey"__SPANCLOSE__$1__SPANEND__');
 
 
-  inputText = inputText.replace(/<sprite name=(.*?)>/g, function(match, p1) {
-    const spriteName = p1.replace(/["']/g, '');
-    let customText = actionTexts[p1] || spriteFallbacks[spriteName] || spriteName;
-    return customText ;
+  // Accept normal rich text as well as the doubled quotes found in some
+  // AssetRipper/CSV exports: name="ruU" and name=""ruU"".
+  inputText = inputText.replace(/<sprite\s+name\s*=\s*(?:"{1,2}|'{1,2})?([^"' >]+)(?:"{1,2}|'{1,2})?\s*\/?>/gi, function(match, spriteName) {
+    const actionSprite = actionTexts[`"${spriteName}"`] || actionTexts[spriteName];
+    if (actionSprite) return actionSprite;
+    const sprite = runeSprites[spriteName];
+    if (sprite) {
+      const displayScale = 0.68;
+      const baseFontSize = 20;
+      const em = function (value) { return `${(value * displayScale / baseFontSize).toFixed(4)}em`; };
+      return `<span class="game-sprite" role="img" aria-label="${spriteName}" style="--sprite-x:${em(-sprite.x)};--sprite-top:${em(-sprite.top)};--sprite-width:${em(sprite.width)};--sprite-height:${em(sprite.height)};--atlas-width:${em(110)};--atlas-height:${em(125)}"></span>`;
+    }
+    return spriteFallbacks[spriteName] || spriteName;
   });
 
 
@@ -300,6 +341,42 @@ const translationTextarea = document.getElementById("translation");
 const preview = document.getElementById("preview");
 const placeholderHint = document.getElementById('placeholder-hint');
 
+// TextMeshPro rune entries from Travellers Rest's gamepad_buttons_ui_512TMPro atlas.
+// The preview ships only the cropped rune area. AssetRipper stores the glyph Y
+// coordinate from the bottom of the original 512x512 atlas.
+const runeSprites = {};
+const runeAtlasHeight = 512;
+const runeCropTop = 350;
+const runeRows = [
+  ['A', 'B', 'C', 'D', 'E', 'F', 108],
+  ['G', 'H', 'I', 'J', 'K', 'L', 91],
+  ['M', 'N', 'O', 'P', 'Q', 'R', 74],
+  ['S', 'T', 'U', 'V', 'W', 'X', 57],
+  ['Y', 'Z', null, null, null, null, 40]
+];
+runeRows.forEach(function (row) {
+  row.slice(0, 6).forEach(function (letter, column) {
+    if (!letter) return;
+    runeSprites[`ru${letter}`] = {
+      x: 2 + column * 17,
+      top: runeAtlasHeight - row[6] - 14 - runeCropTop,
+      width: 12,
+      height: letter === 'E' ? 15 : 14
+    };
+  });
+});
+
+// These four special glyphs are explicitly present in the exported TMP
+// table. Their atlas rectangles are 16x14 at the top of the cropped region.
+[
+  ['RuneFail1', 1, 7],
+  ['RuneFail2', 18, 7],
+  ['RuneFail3', 1, 24],
+  ['RuneFail4', 18, 24]
+].forEach(function ([name, x, top]) {
+  runeSprites[name] = { x, top, width: 16, height: 14 };
+});
+
 if(translationTextarea.value.trim().length <= 0){
   translationTextarea.value = translation;
   window.setTimeout(updatePreview, 0);
@@ -336,10 +413,11 @@ function updatePreview() {
   const isRtlPreview = resolvedDirection === 'rtl';
   previewDiv.dir = resolvedDirection;
   previewDiv.style.textAlign = isRtlPreview ? 'right' : 'left';
-  directionInfo.hidden = !(isRtlPreview || textDirection !== 'auto');
-  if (directionInfo.hidden) {
-    directionInfoText.hidden = true;
-    directionInfo.setAttribute('aria-expanded', 'false');
+  previewRepairNote.hidden = repairedRichTextTags.length === 0;
+  if (repairedRichTextTags.length > 0) {
+    previewRepairNote.textContent = `Missing closing tags were repaired for this preview: ${repairedRichTextTags.map(function (tagName) {
+      return `<${tagName}>`;
+    }).join(', ')}.`;
   }
   placeholderHint.hidden = !/\{\d+\}/.test(inputText);
 }
@@ -351,6 +429,10 @@ const samples = {
   'line-breaks': 'Line one\\nLine two\\n\\nLine four\\ \\Line six',
   rtl: '[Bounce=هذا نص عربي] [Wave=שלום עולם]\\nEnglish mixed with العربية and 日本語.',
   'game-tags': '<size=120%><wiggle>Nigel!</wiggle></size> <wave><sprite name="Music">Song</wave><br><align="center"><b>Centered</b></align> [Brown2=all year round] [PlayerGender=he/she] [SinglePlayer=alone/together]',
+  'animation-modifiers': '<shake a=0.5>Half-strength shake</shake> · <shake s=2>Double-speed shake</shake> · <wiggle a=2 s=0.75>Stronger, slower wiggle</wiggle>',
+  runes: 'Some people ask us to mix <sprite name="ruU"><sprite name="ruL"><sprite name="ruI"><sprite name="ruR"> with <sprite name="ruN"><sprite name="ruA"><sprite name="ruU">…',
+  'rune-alphabet': 'Rune alphabet: <sprite name="ruA"><sprite name="ruB"><sprite name="ruC"><sprite name="ruD"><sprite name="ruE"><sprite name="ruF"><sprite name="ruG"><sprite name="ruH"><sprite name="ruI"><sprite name="ruJ"><sprite name="ruK"><sprite name="ruL"><sprite name="ruM"><sprite name="ruN"><sprite name="ruO"><sprite name="ruP"><sprite name="ruQ"><sprite name="ruR"><sprite name="ruS"><sprite name="ruT"><sprite name="ruU"><sprite name="ruV"><sprite name="ruW"><sprite name="ruX"><sprite name="ruY"><sprite name="ruZ">',
+  'other-sprites': 'Other game sprites: <sprite name="Music"> <sprite name="Rowdy_Emote"> <sprite name="Break_Emote"> <sprite name="RuneFail1"><sprite name="RuneFail2"><sprite name="RuneFail3"><sprite name="RuneFail4">',
   controls: '[ControllerType=Move with [Action: WASD] and open the staff panel with [Action: Staff]/Move with [Action: WASD] and open the staff panel with [Action: Staff]]\\nAction placeholders: {0}, {1}, <sprite name="Music">',
   variants: '[PlayerGender=He/She] is playing [SinglePlayer=alone/together]. [PlayerGender=His/Her] tavern is ready!',
   layout: 'First line\\nSecond line\\n\\nFourth line\\ \Legacy blank line\\n<br>HTML break<align="center">Centered text</align>',
@@ -393,7 +475,21 @@ function getTextDirection(value) {
   return 'ltr';
 }
 
-function addAnimatedText(content, effect) {
+function parseAnimationModifiers(attributes) {
+  const modifiers = { amplitude: 1, speed: 1 };
+  const attributePattern = /\b(a|s)\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))/gi;
+  let match;
+  while ((match = attributePattern.exec(attributes || ''))) {
+    const value = Number(match[2]);
+    if (!Number.isFinite(value) || value <= 0) continue;
+    if (match[1].toLowerCase() === 'a') modifiers.amplitude = value;
+    if (match[1].toLowerCase() === 's') modifiers.speed = value;
+  }
+  return modifiers;
+}
+
+function addAnimatedText(content, effect, modifiers) {
+  modifiers = modifiers || { amplitude: 1, speed: 1 };
   const animatedDocument = new DOMParser().parseFromString(`<div>${content}</div>`, 'text/html');
   const animatedRoot = animatedDocument.body.firstElementChild;
   const textNodes = [];
@@ -414,7 +510,8 @@ function addAnimatedText(content, effect) {
   });
   const direction = getTextDirection(animatedRoot.textContent);
   const placeholder = `__ANIMATED_TEXT_${animationPlaceholders.length}__`;
-  animationPlaceholders.push(`<span class="animated-text animated-${effect}" dir="${direction}" aria-label="${escapeHtml(animatedRoot.textContent)}">${animatedRoot.innerHTML}</span>`);
+  const animationStyle = ` style="--effect-amplitude:${modifiers.amplitude};--effect-speed:${modifiers.speed}"`;
+  animationPlaceholders.push(`<span class="animated-text animated-${effect}"${animationStyle} dir="${direction}" aria-label="${escapeHtml(animatedRoot.textContent)}">${animatedRoot.innerHTML}</span>`);
   return placeholder;
 }
 
@@ -422,8 +519,8 @@ function replaceAnimatedText(inputText) {
   inputText = inputText.replace(/\[(Bounce|Wave|Shake|Pulse|Wiggle)\s*=\s*([^\[\]]+)\]/gi, function (match, effect, content) {
     return addAnimatedText(content, effect.toLowerCase());
   });
-  inputText = inputText.replace(/<(bounce|wave|shake|pulse|wiggle)(?:\s+[^>]*)?>([\s\S]*?)<\/\1>/gi, function (match, effect, content) {
-    return addAnimatedText(content, effect.toLowerCase());
+  inputText = inputText.replace(/<(bounce|wave|shake|pulse|wiggle)([^>]*)>([\s\S]*?)<\/\1>/gi, function (match, effect, attributes, content) {
+    return addAnimatedText(content, effect.toLowerCase(), parseAnimationModifiers(attributes));
   });
   return inputText;
 }

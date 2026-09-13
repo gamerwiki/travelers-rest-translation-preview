@@ -1,11 +1,12 @@
+<!DOCTYPE html>
 <html>
 
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Travelers Rest Translation Preview</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%237e4833'/%3E%3Cpath d='M8 8h16v4H8zm2 6h12v10H10z' fill='%23ffe5bb'/%3E%3C/svg%3E">
-    <link href="./src/styles.css" rel="stylesheet" type="text/css" />
+    <link href="./src/styles.css?v=0.6.10" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
@@ -44,6 +45,11 @@
         <div class="source-panel">
           <div class="panel-title">Source text</div>
           <textarea id="translation" rows="4" cols="50" onchange="updatePreview()"></textarea>
+          <div id="placeholder-hint" hidden>
+            Placeholders such as {0} and {1} are filled by the game at runtime. Leave them unchanged unless they represent a controller input.
+          </div>
+        </div>
+        <div class="translation-controls">
           <div class="sample-controls">
             <label for="sample-select">Samples:</label>
             <select id="sample-select">
@@ -53,15 +59,16 @@
               <option value="line-breaks">Line-break sampler</option>
               <option value="rtl">RTL and mixed text</option>
               <option value="game-tags">Game tag sampler</option>
+              <option value="animation-modifiers">Animation modifiers</option>
+              <option value="runes">Rune sprite sample</option>
+              <option value="rune-alphabet">Full rune alphabet</option>
+              <option value="other-sprites">Other game sprites</option>
               <option value="controls">Controllers and placeholders</option>
               <option value="variants">Gender and co-op variants</option>
               <option value="layout">Layout markers</option>
               <option value="edge-cases">Edge cases</option>
             </select>
-            <button id="samples-button" type="button">Load sample</button>
-          </div>
-          <div id="placeholder-hint" hidden>
-            Placeholders such as {0} and {1} are filled by the game at runtime. Leave them unchanged unless they represent a controller input.
+            <button id="samples-button" type="button">Load selected sample</button>
           </div>
           <div class="option single-player-option">
             <label for="single-player">Single-player:</label>
@@ -74,10 +81,19 @@
               <option value="ltr">Left-to-right</option>
               <option value="rtl">Right-to-left</option>
             </select>
-            <button id="direction-info" type="button" aria-label="About text direction" aria-expanded="false" hidden>ⓘ</button>
           </div>
-          <div id="direction-info-text" hidden>
-            This direction setting only affects the website preview. It does not change the translation or guarantee the same layout in Travellers Rest.
+          <button id="preview-info-button" type="button" aria-expanded="false">ⓘ Preview notes</button>
+          <div id="preview-info-panel" hidden>
+            <p>This preview only affects this website. It does not change the translation or guarantee the same layout in Travellers Rest.</p>
+            <ul>
+              <li>RTL auto-detection follows the first strong character; use the direction selector to force it.</li>
+              <li>Placeholders such as {0} and {1} are filled by the game at runtime.</li>
+              <li>Text Animator modifiers are supported for effects: <code>a</code> changes amplitude and <code>s</code> changes speed, for example <code>&lt;shake a=0.5 s=2&gt;...&lt;/shake&gt;</code>.</li>
+              <li>This preview implements only the Text Animator effects observed in Travellers Rest: <code>bounce</code>, <code>shake</code>, <code>wave</code>, and <code>wiggle</code>. It is not a general preview for every Febucci effect.</li>
+              <li>Travellers Rest rune sprites such as <code>&lt;sprite name="ruU"&gt;</code> are rendered from the game's UI atlas.</li>
+              <li>Samples are examples and do not alter the source file.</li>
+            </ul>
+            <p id="preview-repair-note" hidden></p>
           </div>
         </div>
         <div class="preview-panel">
@@ -86,11 +102,15 @@
         </div>
       </div>
       <div class="credits">
-        <span class="text">Made with <span class="heart" id="emoji"></span> by:</span>
-        <i class="discord"></i>
-        <span class="text-highlight">RogerHN</span>
-        <span class="text">with additions by</span>
-        <span class="text-highlight">AcTePuKc</span>
+        <span class="credit-group">
+          <span class="text">Made with <span class="heart" id="emoji"></span> by:</span>
+          <i class="discord"></i>
+          <span class="text-highlight">RogerHN</span>
+        </span>
+        <span class="credit-group">
+          <span class="text">with additions by</span>
+          <span class="text-highlight">AcTePuKc</span>
+        </span>
       </div>
     </div>
     <script src="./src/script.js"></script>
