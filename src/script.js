@@ -262,7 +262,7 @@ function replaceTagsAndActions(inputText, controlType) {
       const displayScale = 0.68;
       const baseFontSize = 20;
       const em = function (value) { return `${(value * displayScale / baseFontSize).toFixed(4)}em`; };
-      return `<span class="game-sprite" role="img" aria-label="${spriteName}" style="--sprite-x:${em(-sprite.x)};--sprite-top:${em(-sprite.top)};--sprite-width:${em(sprite.width)};--sprite-height:${em(sprite.height)};--atlas-width:${em(110)};--atlas-height:${em(140)}"></span>`;
+      return `<span class="game-sprite" role="img" aria-label="${spriteName}" style="--sprite-x:${em(-sprite.x)};--sprite-top:${em(-sprite.top)};--sprite-width:${em(sprite.width)};--sprite-height:${em(sprite.height)};--atlas-width:${em(110)};--atlas-height:${em(125)}"></span>`;
     }
     return spriteFallbacks[spriteName] || spriteName;
   });
